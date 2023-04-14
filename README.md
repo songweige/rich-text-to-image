@@ -4,7 +4,9 @@
 
 **tl;dr:** We explore using versatile format information from rich text, including font size, color, style, and footnote, to increase control of text-to-image generation. Our method enables explicit token reweighting, precise color rendering, local style control, and detailed region synthesis.
 
-https://user-images.githubusercontent.com/22885450/231915262-77101fec-7190-4912-94c0-f0097aded03a.mp4
+
+https://user-images.githubusercontent.com/22885450/231924279-5d3400f0-b679-4ff9-be69-281e93265603.mp4
+
 
 ***Expressive Text-to-Image Generation with Rich Text*** <br>
 [Songwei Ge](https://songweige.github.io/), [Taesung Park](https://taesung.me/), [Jun-Yan Zhu](https://www.cs.cmu.edu/~junyanz/), [Jia-Bin Huang](https://jbhuang0604.github.io/)<br>
