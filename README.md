@@ -1,12 +1,11 @@
 # Rich-Text-to-Image
 
-### [Project Page](https://rich-text-to-image.github.io/) | [Paper](https://arxiv.org/abs/) | [Demo](https://github.com/SongweiGe/rich-text-to-image#rich-text-json-to-image)
+### [Project Page](https://rich-text-to-image.github.io/) | [Paper](https://arxiv.org/abs/2304.06720) | [Demo](https://github.com/SongweiGe/rich-text-to-image#rich-text-json-to-image)
 
 **tl;dr** We explore using versatile format information from rich text including font size, color, style, and footnote to facilitate text-to-image generation. Our framework enables intuitive local style control, precise color generation, and complementary description for long prompts.
 
-<p align="left">
-    <img src=assets/teaser.gif width="800" height="337" />
-</p>
+https://rich-text-to-image.github.io/video_assets/workflow_demo.mp4
+
 
 ***Expressive Text-to-Image Generation with Rich Text*** <br>
 [Songwei Ge](https://songweige.github.io/), [Taesung Park](https://taesung.me/), [Jun-Yan Zhu](https://www.cs.cmu.edu/~junyanz/), [Jia-Bin Huang](https://jbhuang0604.github.io/)<br>
@@ -28,7 +27,7 @@ In general, our pipeline contains two steps. We first input the plain text promp
 We encode the rich text into JSON format and use it as the input to the rich-text conditioned sampling script `sample.py`. To automatically generate a JSON string based on rich text, please use our [rich-text-to-json](https://rich-text-to-image.github.io/rich-text-to-json.html) interface, which is a purely static webpage that can be readily incorporated into any rich-text related application.
 
 ### Rich-text JSON to Image
-![teaser](assets/teaser.png)
+![teaser](assets/teaser.jpg)
 
 You may start generating images with rich-text json via our local gradio demo:
 
