@@ -2,7 +2,7 @@
 
 ### [Project Page](https://rich-text-to-image.github.io/) | [Paper](https://arxiv.org/abs/)
 
-**tl;dr:** We explore using versatile format information from rich text, including font size, color, style, and footnote, to increase control of text-to-image generation. Our method enables intuitive local style control, precise color generation, and complementary description for long prompts.
+**tl;dr:** We explore using versatile format information from rich text, including font size, color, style, and footnote, to increase control of text-to-image generation. Our method enables explicit token reweighting, precise color rendering, local style control, and detailed region synthesis.
 
 <p align="left">
     <img src=assets/teaser.gif width="800" height="337" />
@@ -24,10 +24,10 @@ pip install git+https://github.com/openai/CLIP.git
 conda activate rich-text
 ```
 ## Usage
-In general, our pipeline contains two steps. We first input the plain text prompt to the diffusion model and compute the cross-attention maps to associate each token with the spatial region. The rich text prompts obtained from the editor are stored in JSON format, providing attributes for each token span. We use a new region-based diffusion to render each region’s attributes into a globally coherent image. Below we provide the basic usage of various font formats.
+In general, our pipeline contains two steps. We first input the plain text prompt to the diffusion model and compute the cross-attention maps to associate each token with the spatial region. The rich-text prompts obtained from the editor are stored in JSON format, providing attributes for each token span. We use a new region-based diffusion to render each region’s attributes into a globally coherent image. Below we provide the basic usage of various font formats.
 
 ### Rich text to JSON
-We encode the rich text into JSON format and use it as the input to the rich-text conditioned sampling script `sample.py`. To automatically generate a JSON string based on rich text, please use our [rich-text-to-json](https://rich-text-to-image.github.io/rich-text-to-json.html) interface, which is a purely static webpage that can be readily incorporated into any rich-text-based application.
+We encode the rich text into JSON format and use it as the input to the rich-text conditioned sampling script `sample.py`. To automatically generate a JSON string based on rich text, you can use our [rich-text-to-json](https://rich-text-to-image.github.io/rich-text-to-json.html) interface, which is a purely static webpage that can be readily incorporated into any rich-text-based application.
 
 ### Rich-text JSON to Image
 ![teaser](assets/teaser.png)
@@ -43,7 +43,10 @@ python sample.py --rich_text_json 'your rich-text json here'
 ```
 
 #### Font Style
-Just as the font style distinguishes the styles of individual text elements, we propose using it to define the style of specific areas in the generation. Here is an example script to generate "a beautiful garden (in the style of Claude Monet) with a snow mountain (in the style of Ukiyo-e) in the background".
+
+![style](assets/font.png)
+
+Just as the font style distinguishes the styles of individual text elements, we propose using it to define the artistic style of specific areas in the generation. Here is an example script to generate "a beautiful garden (in the style of Claude Monet) with a snow mountain (in the style of Ukiyo-e) in the background".
 
 ```
 python sample.py --rich_text_json '{"ops":[{"insert":"a "},{"attributes":{"font":"mirza"},"insert":"beautiful garden"},{"insert":" with a "},{"attributes":{"font":"roboto"},"insert":"snow mountain in the background"},{"insert":"\n"}]}' --seed 3
@@ -51,6 +54,9 @@ python sample.py --rich_text_json '{"ops":[{"insert":"a "},{"attributes":{"font"
 
 
 #### Font Color
+
+![color](assets/color.png)
+
 We use font color to control the precise color of the generated objects. For example, the script below generates "a Gothic church (with color #b26b00) in the sunset with a beautiful landscape in the background."
 
 ```
@@ -58,7 +64,10 @@ python sample.py --rich_text_json '{"ops":[{"insert":"a Gothic "},{"attributes":
 ```
 
 #### Font Size
-Font size indicates the weight of each token in the final generation. This is implemented by reweighting the exponential attention score before the softmax at each cross attention layer. The following example adds more pineapple to a generated pizze:
+
+![size](assets/size.png)
+
+Font size indicates the weight of each token in the final generation. This is implemented by reweighting the exponential attention score before the softmax at each cross-attention layer. The following example adds more pineapple to a generated pizze:
 
 ```
 python sample.py --rich_text_json '{"ops": [{"insert": "A pizza with "}, {"attributes": {"size": "50px"}, "insert": "pineapples"}, {"insert": ", pepperonis, and mushrooms on the top, 4k, photorealistic\n"}]}' --height 768 --width 896 --negative_prompt 'blurry, art, painting, rendering, drawing, sketch, ugly, duplicate, morbid, mutilated, mutated, deformed, disfigured low quality, worst quality'
@@ -66,7 +75,9 @@ python sample.py --rich_text_json '{"ops": [{"insert": "A pizza with "}, {"attri
 
 #### Footnote
 
-We use footnote in the rich text to provide complementary descriptions to the selected text elements. The following script generates a cat wearing sunglasses and bandana, which is often failed by default as shown in [eDiffi](https://research.nvidia.com/labs/dir/eDiff-I/#comparison_stable_cat_scooter).
+![footnote](assets/footnote.png)
+
+We use footnote in the rich text to provide supplementary descriptions to the selected text elements. The following script generates a cat wearing sunglasses and bandana, which is often failed by default as shown in [eDiffi](https://research.nvidia.com/labs/dir/eDiff-I/#comparison_stable_cat_scooter).
 
 ```
 python sample.py --rich_text_json '{"ops":[{"insert":"A close-up 4k dslr photo of a "},{"attributes":{"link":"A cat wearing sunglasses and a bandana around its neck."},"insert":"cat"},{"insert":" riding a scooter. Palm trees in the background.\n"}]}'
