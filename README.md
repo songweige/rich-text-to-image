@@ -1,6 +1,8 @@
 # Rich-Text-to-Image
 
-### [Project Page](https://rich-text-to-image.github.io/) | [Paper](https://arxiv.org/abs/2304.06720) | [Demo](https://github.com/SongweiGe/rich-text-to-image#rich-text-json-to-image)
+### [Project Page](https://rich-text-to-image.github.io/) | [Paper](https://arxiv.org/abs/2304.06720) | [Demo](https://github.com/SongweiGe/rich-text-to-image#rich-text-json-to-image) [![HuggingFace Demo](https://huggingface.co/datasets/huggingface/badges/raw/main/open-in-hf-spaces-md.svg)](https://huggingface.co/spaces/songweig/rich-text-to-image)
+
+
 
 **tl;dr:** We explore using versatile format information from rich text, including font size, color, style, and footnote, to increase control of text-to-image generation. Our method enables explicit token reweighting, precise color rendering, local style control, and detailed region synthesis.
 
