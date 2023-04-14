@@ -37,7 +37,7 @@ We encode the rich text into JSON format and use it as the input to the rich-tex
 You may start generating images with rich-text JSON via our local gradio demo:
 
 ```
-python app_gradio.py
+python gradio_app.py
 ```
 Or through the command line:
 ```
