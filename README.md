@@ -1,6 +1,8 @@
 # Rich-Text-to-Image
 
-### [Project Page](https://rich-text-to-image.github.io/) | [Paper](https://arxiv.org/abs/2304.06720) | [Demo](https://github.com/SongweiGe/rich-text-to-image#rich-text-json-to-image) [![HuggingFace Demo](https://huggingface.co/datasets/huggingface/badges/raw/main/open-in-hf-spaces-md.svg)](https://huggingface.co/spaces/songweig/rich-text-to-image)
+### [Project Page](https://rich-text-to-image.github.io/) | [Paper](https://arxiv.org/abs/2304.06720) | [Demo](https://github.com/SongweiGe/rich-text-to-image#rich-text-json-to-image) (Under construction for integrating the editor)
+
+<!--[![HuggingFace Demo](https://huggingface.co/datasets/huggingface/badges/raw/main/open-in-hf-spaces-md.svg)](https://huggingface.co/spaces/songweig/rich-text-to-image)-->
 
 
 
