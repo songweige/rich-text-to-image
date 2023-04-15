@@ -38,6 +38,7 @@ def main():
         color_guidance_weight: float,
     ):
         run_dir = 'results/'
+        os.makedirs(run_dir, exist_ok=True)
         # Load region diffusion model.
         steps = 41 if not steps else steps
         guidance_weight = 8.5 if not guidance_weight else guidance_weight
