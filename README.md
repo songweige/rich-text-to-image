@@ -1,13 +1,11 @@
 # Rich-Text-to-Image
 
-### [Project Page](https://rich-text-to-image.github.io/) | [Paper](https://arxiv.org/abs/2304.06720) | [Demo](https://github.com/SongweiGe/rich-text-to-image#rich-text-json-to-image) (Under construction for integrating the editor)
-
-<!--[![HuggingFace Demo](https://huggingface.co/datasets/huggingface/badges/raw/main/open-in-hf-spaces-md.svg)](https://huggingface.co/spaces/songweig/rich-text-to-image)-->
-
+### [Project Page](https://rich-text-to-image.github.io/) | [Paper](https://arxiv.org/abs/2304.06720) | [Demo](https://github.com/SongweiGe/rich-text-to-image#rich-text-json-to-image) | [![HuggingFace Demo](https://huggingface.co/datasets/huggingface/badges/raw/main/open-in-hf-spaces-md.svg)](https://huggingface.co/spaces/songweig/rich-text-to-image)
 
 
 **tl;dr:** We use various formatting information from rich text, including font size, color, style, and footnote, to increase control of text-to-image generation. Our method enables explicit token reweighting, precise color rendering, local style control, and detailed region synthesis.
 
+\* The huggingface demo is being upgraded to integrate a rich-text editor.
 
 https://user-images.githubusercontent.com/22885450/231924279-5d3400f0-b679-4ff9-be69-281e93265603.mp4
 
