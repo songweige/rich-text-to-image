@@ -599,6 +599,7 @@ class CrossAttention(nn.Module):
 
         # attention, what we cannot get enough of
         if self._use_memory_efficient_attention_xformers:
+            raise NotImplementedError('Memory efficient attention is not supported with font size.')
             hidden_states = self._memory_efficient_attention_xformers(
                 query, key, value)
             # Some versions of xformers return output in fp32, cast it back to the dtype of the input
