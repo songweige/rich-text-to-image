@@ -123,4 +123,4 @@ python visualize_token_maps.py --text_prompt "a camera on a tripod taking a pict
 
 ## Acknowledgement
 
-We thank Mia Tang, Aaron Hertzmann, Nupur Kumari, Gaurav Parmar, Ruihan Gao, and Aniruddha Mahapatra for their helpful discussion and paper reading. We thank AK, Radamés Ajna, and other HuggingFace team members for their help and support with our online demo.Our rich-text editor is built on [Quill](https://quilljs.com/). Our model code is built on [huggingface / diffusers](https://github.com/huggingface/diffusers#readme).
+We thank Mia Tang, Aaron Hertzmann, Nupur Kumari, Gaurav Parmar, Ruihan Gao, and Aniruddha Mahapatra for their helpful discussion and paper reading. We thank AK, Radamés Ajna, and other HuggingFace team members for their help and support with the [online demo](https://huggingface.co/spaces/songweig/rich-text-to-image). Our rich-text editor is built on [Quill](https://quilljs.com/). Our model code is built on [huggingface / diffusers](https://github.com/huggingface/diffusers#readme).
