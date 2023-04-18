@@ -1,18 +1,18 @@
 # Rich-Text-to-Image
 
-### [Project Page](https://rich-text-to-image.github.io/) | [Paper](https://arxiv.org/abs/2304.06720) | [Demo](https://github.com/SongweiGe/rich-text-to-image#rich-text-json-to-image) [![HuggingFace Demo](https://huggingface.co/datasets/huggingface/badges/raw/main/open-in-hf-spaces-md.svg)](https://huggingface.co/spaces/songweig/rich-text-to-image)
+### [Project Page](https://rich-text-to-image.github.io/) | [Paper](https://arxiv.org/abs/2304.06720) | [Demo](https://github.com/SongweiGe/rich-text-to-image#rich-text-json-to-image) | [![HuggingFace Demo](https://huggingface.co/datasets/huggingface/badges/raw/main/open-in-hf-spaces-md.svg)](https://huggingface.co/spaces/songweig/rich-text-to-image)
 
 
+**tl;dr:** We use various formatting information from rich text, including font size, color, style, and footnote, to increase control of text-to-image generation. Our method enables explicit token reweighting, precise color rendering, local style control, and detailed region synthesis.
 
-**tl;dr:** We explore using versatile format information from rich text, including font size, color, style, and footnote, to increase control of text-to-image generation. Our method enables explicit token reweighting, precise color rendering, local style control, and detailed region synthesis.
-
+\* The huggingface demo is being upgraded to integrate a rich-text editor.
 
 https://user-images.githubusercontent.com/22885450/231924279-5d3400f0-b679-4ff9-be69-281e93265603.mp4
 
 
 ***Expressive Text-to-Image Generation with Rich Text*** <br>
 [Songwei Ge](https://songweige.github.io/), [Taesung Park](https://taesung.me/), [Jun-Yan Zhu](https://www.cs.cmu.edu/~junyanz/), [Jia-Bin Huang](https://jbhuang0604.github.io/)<br>
-UMD, Adobe Inc., CMU<br>
+UMD, Adobe, CMU<br>
 arXiv, 2023
 
 ## Setup
@@ -62,14 +62,14 @@ python sample.py --rich_text_json '{"ops":[{"insert":"a "},{"attributes":{"font"
 We use font color to control the precise color of the generated objects. For example, the script below generates "a Gothic church (with color #b26b00) in the sunset with a beautiful landscape in the background."
 
 ```
-python sample.py --rich_text_json '{"ops":[{"insert":"a Gothic "},{"attributes":{"color":"#b26b00"},"insert":"church"},{"insert":" in a the sunset with a beautiful landscape in the background.\n"}]}'
+python sample.py --rich_text_json '{"ops":[{"insert":"a Gothic "},{"attributes":{"color":"#b26b00"},"insert":"church"},{"insert":" in a sunset with a beautiful landscape in the background.\n"}]}'
 ```
 
 #### Font Size
 
 ![size](assets/size.png)
 
-Font size indicates the weight of each token in the final generation. This is implemented by reweighting the exponential attention score before the softmax at each cross-attention layer. The following example adds more pineapple to a generated pizze:
+Font size indicates the weight of each token in the final generation. This is implemented by reweighting the exponential attention score before the softmax at each cross-attention layer. The following example adds more pineapple to a generated pizza:
 
 ```
 python sample.py --rich_text_json '{"ops": [{"insert": "A pizza with "}, {"attributes": {"size": "50px"}, "insert": "pineapples"}, {"insert": ", pepperonis, and mushrooms on the top, 4k, photorealistic\n"}]}' --height 768 --width 896 --negative_prompt 'blurry, art, painting, rendering, drawing, sketch, ugly, duplicate, morbid, mutilated, mutated, deformed, disfigured low quality, worst quality'
@@ -79,7 +79,7 @@ python sample.py --rich_text_json '{"ops": [{"insert": "A pizza with "}, {"attri
 
 ![footnote](assets/footnote.png)
 
-We use footnote in the rich text to provide supplementary descriptions to the selected text elements. The following script generates a cat wearing sunglasses and bandana, which is often failed by default as shown in [eDiffi](https://research.nvidia.com/labs/dir/eDiff-I/#comparison_stable_cat_scooter).
+We use footnotes to provide supplementary descriptions for selected text elements. The following script generates a cat wearing sunglasses and bandana, which is a difficult case as mentioned in [eDiffi](https://research.nvidia.com/labs/dir/eDiff-I/#comparison_stable_cat_scooter).
 
 ```
 python sample.py --rich_text_json '{"ops":[{"insert":"A close-up 4k dslr photo of a "},{"attributes":{"link":"A cat wearing sunglasses and a bandana around its neck."},"insert":"cat"},{"insert":" riding a scooter. Palm trees in the background.\n"}]}'
