@@ -5,8 +5,6 @@
 
 **tl;dr:** We use various formatting information from rich text, including font size, color, style, and footnote, to increase control of text-to-image generation. Our method enables explicit token reweighting, precise color rendering, local style control, and detailed region synthesis.
 
-\* The huggingface demo is being upgraded to integrate a rich-text editor.
-
 https://user-images.githubusercontent.com/22885450/231924279-5d3400f0-b679-4ff9-be69-281e93265603.mp4
 
 
@@ -118,11 +116,11 @@ python visualize_token_maps.py --text_prompt "a camera on a tripod taking a pict
 @article{ge2023expressive,
     title={Expressive Text-to-Image Generation with Rich Text},
     author={Ge, Songwei and Park, Taesung and Zhu, Jun-Yan and Huang, Jia-Bin},
-    journal={arXiv preprint arXiv:},
+    journal={arXiv preprint arXiv:2304.06720},
     year={2023}
 }
 ```
 
 ## Acknowledgement
 
-We thank Mia Tang, Aaron Hertzmann, Nupur Kumari, Gaurav Parmar, Ruihan Gao, and Aniruddha Mahapatra for their helpful discussion and paper reading. Our rich-text editor is built on [Quill](https://quilljs.com/). Our model code is built on [huggingface / diffusers](https://github.com/huggingface/diffusers#readme).
+We thank Mia Tang, Aaron Hertzmann, Nupur Kumari, Gaurav Parmar, Ruihan Gao, and Aniruddha Mahapatra for their helpful discussion and paper reading. We thank AK, Radamés Ajna, and other HuggingFace team members for their help and support with our online demo.Our rich-text editor is built on [Quill](https://quilljs.com/). Our model code is built on [huggingface / diffusers](https://github.com/huggingface/diffusers#readme).
