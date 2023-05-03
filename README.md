@@ -89,7 +89,6 @@ We use footnotes to provide supplementary descriptions for selected text element
 ```
 python sample.py --rich_text_json '{"ops":[{"insert":"A close-up 4k dslr photo of a "},{"attributes":{"link":"A cat wearing sunglasses and a bandana around its neck."},"insert":"cat"},{"insert":" riding a scooter. Palm trees in the background.\n"}]}' --bg_aug_end 500 --num_segments 5 --run_dir results/footnote_example
 ```
-```
 
 ## Evaluation
 
