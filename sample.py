@@ -39,7 +39,7 @@ def main(args, param):
 
     # create control input for region guidance
     text_format_dict, color_target_token_ids = get_gradient_guidance_input(
-        model, base_tokens, color_text_prompts, color_rgbs, text_format_dict)
+        model, base_tokens, color_text_prompts, color_rgbs, text_format_dict, color_guidance_weight=args.color_guidance_weight)
 
     height = param['height']
     width = param['width']
@@ -50,7 +50,7 @@ def main(args, param):
     # get token maps from plain text to image generation.
     begin_time = time.time()
     if model.attention_maps is None:
-        model.register_evaluation_hooks()
+        model.register_tokenmap_hooks()
     else:
         model.reset_attention_maps()
     plain_img = model.produce_attn_maps([base_text_prompt], [negative_text],
@@ -59,23 +59,28 @@ def main(args, param):
     fn_base = os.path.join(run_dir, 'seed%d_plain.png' % (seed))
     imageio.imwrite(fn_base, plain_img[0])
     print('time lapses to get attention maps: %.4f' % (time.time()-begin_time))
-    color_obj_masks = get_token_maps(
-        model.attention_maps, run_dir, width//8, height//8, color_target_token_ids, seed)
-    model.masks = get_token_maps(
-        model.attention_maps, run_dir, width//8, height//8, region_target_token_ids, seed, base_tokens)
+    seed_everything(seed)
+    color_obj_masks = get_token_maps(model.selfattn_maps, model.crossattn_maps, model.n_maps, run_dir,
+                                     height//8, width//8, color_target_token_ids[:-1], seed,
+                                     base_tokens, segment_threshold=args.segment_threshold, num_segments=args.num_segments)
     color_obj_masks = [transforms.functional.resize(color_obj_mask, (height, width),
                                                     interpolation=transforms.InterpolationMode.BICUBIC,
                                                     antialias=True)
                        for color_obj_mask in color_obj_masks]
     text_format_dict['color_obj_atten'] = color_obj_masks
-    model.remove_evaluation_hooks()
+    seed_everything(seed)
+    model.masks = get_token_maps(model.selfattn_maps, model.crossattn_maps, model.n_maps, run_dir,
+                                 height//8, width//8, region_target_token_ids[:-1], seed,
+                                 base_tokens, segment_threshold=args.segment_threshold, num_segments=args.num_segments)
+    model.remove_tokenmap_hooks()
 
     # generate image from rich text
     begin_time = time.time()
     seed_everything(seed)
     rich_img = model.prompt_to_img(region_text_prompts, [negative_text],
                                    height=height, width=width, num_inference_steps=param['steps'],
-                                   guidance_scale=param['guidance_weight'], use_grad_guidance=use_grad_guidance,
+                                   guidance_scale=param['guidance_weight'], use_guidance=use_grad_guidance,
+                                   inject_selfattn=args.inject_selfattn, bg_aug_end=args.bg_aug_end,
                                    text_format_dict=text_format_dict)
     print('time lapses to generate image from rich text: %.4f' %
           (time.time()-begin_time))
@@ -95,6 +100,11 @@ if __name__ == '__main__':
                         default='{"ops":[{"insert":"A close-up 4k dslr photo of a "},{"attributes":{"link":"A cat wearing sunglasses and a bandana around its neck."},"insert":"cat"},{"insert":" riding a scooter. There are palm trees in the background."}]}')
     parser.add_argument('--negative_prompt', type=str, default='')
     parser.add_argument('--guidance_weight', type=float, default=8.5)
+    parser.add_argument('--color_guidance_weight', type=float, default=0.5)
+    parser.add_argument('--inject_selfattn', type=float, default=0.)
+    parser.add_argument('--segment_threshold', type=float, default=0.3)
+    parser.add_argument('--num_segments', type=int, default=9)
+    parser.add_argument('--bg_aug_end', type=int, default=1000)
     args = parser.parse_args()
     param = {
         'text_input': json.loads(args.rich_text_json),

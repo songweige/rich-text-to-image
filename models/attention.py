@@ -492,7 +492,7 @@ class BasicTransformerBlock(nn.Module):
 
         if self.only_cross_attention:
             attn_out, _ = self.attn1(
-                norm_hidden_states, context, text_format_dict=text_format_dict) + hidden_states
+                norm_hidden_states, context=context, text_format_dict=text_format_dict) + hidden_states
             hidden_states = attn_out + hidden_states
         else:
             attn_out, _ = self.attn1(norm_hidden_states)
@@ -583,7 +583,7 @@ class CrossAttention(nn.Module):
                                 head_size, seq_len, seq_len2)
         return tensor.mean(1)
 
-    def forward(self, hidden_states, context=None, mask=None, text_format_dict={}):
+    def forward(self, hidden_states, real_attn_probs=None, context=None, mask=None, text_format_dict={}):
         batch_size, sequence_length, _ = hidden_states.shape
 
         query = self.to_q(hidden_states)
@@ -599,7 +599,6 @@ class CrossAttention(nn.Module):
 
         # attention, what we cannot get enough of
         if self._use_memory_efficient_attention_xformers:
-            raise NotImplementedError('Memory efficient attention is not supported with font size.')
             hidden_states = self._memory_efficient_attention_xformers(
                 query, key, value)
             # Some versions of xformers return output in fp32, cast it back to the dtype of the input
@@ -608,7 +607,7 @@ class CrossAttention(nn.Module):
             if self._slice_size is None or query.shape[0] // self._slice_size == 1:
                 # only this attention function is used
                 hidden_states, attn_probs = self._attention(
-                    query, key, value, **text_format_dict)
+                    query, key, value, real_attn_probs, **text_format_dict)
 
         # linear proj
         hidden_states = self.to_out[0](hidden_states)
@@ -626,11 +625,11 @@ class CrossAttention(nn.Module):
             alpha=self.scale,
         )
 
-    def _attention(self, query, key, value, word_pos=None, font_size=None,
+    def _attention(self, query, key, value, real_attn_probs=None, word_pos=None, font_size=None,
                    **kwargs):
         attention_scores = self._qk(query, key)
 
-        # Font size:
+        # Font size V2:
         if self.is_cross_attn and word_pos is not None and font_size is not None:
             assert key.shape[1] == 77
             attention_score_exp = attention_scores.exp()
@@ -643,13 +642,25 @@ class CrossAttention(nn.Module):
         else:
             attention_probs = attention_scores.softmax(dim=-1)
 
-        hidden_states = torch.bmm(attention_probs, value)
+        # compute attention output
+        if real_attn_probs is None:
+            hidden_states = torch.bmm(attention_probs, value)
+        else:
+            if isinstance(real_attn_probs, dict):
+                for pos1, pos2 in zip(real_attn_probs['inject_pos'][0], real_attn_probs['inject_pos'][1]):
+                    attention_probs[:, :,
+                                    pos2] = real_attn_probs['reference'][:, :, pos1]
+                hidden_states = torch.bmm(attention_probs, value)
+            else:
+                hidden_states = torch.bmm(real_attn_probs, value)
 
         # reshape hidden_states
         hidden_states = self.reshape_batch_dim_to_heads(hidden_states)
-        attention_probs = self.reshape_batch_dim_to_heads_and_average(
+
+        # we also return the map averaged over heads to save memory footprint
+        attention_probs_avg = self.reshape_batch_dim_to_heads_and_average(
             attention_probs)
-        return hidden_states, attention_probs
+        return hidden_states, [attention_probs_avg, attention_probs]
 
     def _memory_efficient_attention_xformers(self, query, key, value):
         query = query.contiguous()
