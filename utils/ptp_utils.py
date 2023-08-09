@@ -308,7 +308,7 @@ def text2image_ldm_stable(
         text_input.input_ids.to(model.device))[0]
     max_length = text_input.input_ids.shape[-1]
     uncond_input = model.tokenizer(
-        ["bad quality, blurry, dark"] * batch_size, padding="max_length", max_length=max_length, return_tensors="pt"
+        [""] * batch_size, padding="max_length", max_length=max_length, return_tensors="pt"
     )
     uncond_embeddings = model.text_encoder(
         uncond_input.input_ids.to(model.device))[0]

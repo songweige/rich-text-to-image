@@ -1,3 +1,6 @@
+import sys
+sys.path.append('.')
+
 import torch
 import argparse
 import numpy as np
@@ -9,8 +12,6 @@ from models.region_diffusion import RegionDiffusion
 from utils import ptp_utils
 from utils.richtext_utils import find_nearest_color, seed_everything
 from utils.attention_utils import get_token_maps
-import sys
-sys.path.append('.')
 
 
 COLORS_common = {
@@ -125,11 +126,11 @@ COLORS_rgb = {
 OBJECTS = [
     'shirt',
     'pants',
-    'vehicle',
+    'car',
     'fruit',
     'vegetable',
     'flower',
-    'beverage',
+    'bottle beverage',
     'plant',
     'candy',
     'toy',
@@ -141,11 +142,11 @@ OBJECTS = [
 BASE_PROMPTS = [
     'a man wearing a shirt',
     'a woman wearing pants',
-    'a vehicle in the street',
+    'a car in the street',
     'a basket of fruit',
     'a bowl of vegetable',
     'a flower in a vase',
-    'a beverage on the table',
+    'a bottle of beverage on the table',
     'a plant in the garden',
     'a candy on the table',
     'a toy on the floor',
@@ -171,7 +172,7 @@ def main(args):
 
     region_model = RegionDiffusion(device)
     ldm_stable = StableDiffusionPipeline.from_pretrained(
-        "./runwayml/stable-diffusion-v1-5").to(device)
+        "runwayml/stable-diffusion-v1-5").to(device)
     tokenizer = ldm_stable.tokenizer
 
     ours_min_dis = []
@@ -190,11 +191,11 @@ def main(args):
 
     for seed in range(init_seed, init_seed+3):
         seed_everything(seed)
-        latent = torch.randn((1, 4, 512 // 8, 512 // 8), device='cuda')
+        latent = torch.randn((1, 4, height // 8, width // 8), device='cuda')
 
         for text_prompt, object_name in zip(BASE_PROMPTS, OBJECTS):
             base_name = object_name
-            region_model.register_evaluation_hooks()
+            region_model.register_tokenmap_hooks()
             seed_everything(seed)
             img_base = region_model.produce_attn_maps([text_prompt], [negative_text],
                                                       height=height, width=width, num_inference_steps=NUM_DIFFUSION_STEPS,
@@ -212,19 +213,24 @@ def main(args):
             obj_token_ids.append(obj_token_ids_rest)
             obj_token_ids = [torch.LongTensor(obj_token_id)
                              for obj_token_id in obj_token_ids]
-            region_model.masks = get_token_maps(
-                region_model.attention_maps, save_path, width//8, height//8, obj_token_ids, seed)
+            region_model.masks = get_token_maps(region_model.selfattn_maps, region_model.crossattn_maps, region_model.n_maps, save_path,
+                                     height//8, width//8, obj_token_ids[:-1], seed,
+                                     base_tokens, segment_threshold=0.3, num_segments=15)
             region_masks = [torchvision.transforms.functional.resize(region_mask, (height, width),
                                                                      interpolation=torchvision.transforms.InterpolationMode.BICUBIC, antialias=True).cpu().clamp(0, 1).numpy()
                             for region_mask in region_model.masks]
+            color_obj_atten_all = torch.zeros_like(region_model.masks[-1])
+            for obj_mask in region_model.masks[:-1]:
+                color_obj_atten_all += obj_mask
             color_obj_masks = [torchvision.transforms.functional.resize(color_obj_mask, (height, width),
                                                                         interpolation=torchvision.transforms.InterpolationMode.BICUBIC, antialias=True)
                                for color_obj_mask in region_model.masks]
+            text_format_dict['color_obj_atten_all'] = color_obj_atten_all
             text_format_dict['color_obj_atten'] = color_obj_masks
             if args.save_img:
                 imageio.imwrite(os.path.join(
                     save_path, 'plain_%s_seed%d.png' % (base_name, seed)), img_base[0])
-            region_model.remove_evaluation_hooks()
+            region_model.remove_tokenmap_hooks()
             images_ours = []
             images_p2p = []
             for color_name in COLORS:
@@ -245,7 +251,8 @@ def main(args):
                     img_ours = region_model.prompt_to_img(text_prompts_rich, [negative_text],
                                                           height=height, width=width, num_inference_steps=NUM_DIFFUSION_STEPS,
                                                           guidance_scale=GUIDANCE_SCALE, text_format_dict=text_format_dict, latents=latent,
-                                                          use_grad_guidance=True)
+                                                          use_guidance=True, inject_selfattn=0.2,
+                                                          inject_background=0.3)
                     if args.save_img:
                         imageio.imwrite(ours_name, img_ours[0])
                     if len(images_ours) == 0:
@@ -264,6 +271,8 @@ def main(args):
 
                     img_p2p = img_p2p.astype(float)
                     if args.save_img:
+                        imageio.imwrite(os.path.join(
+                            save_path, 'p2p_%s.png' % (base_name)), img_p2p[0])
                         imageio.imwrite(p2p_name, img_p2p[1])
                     if len(images_p2p) == 0:
                         images_p2p.append(img_p2p[0])

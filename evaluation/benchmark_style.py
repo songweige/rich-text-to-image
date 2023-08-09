@@ -18,28 +18,28 @@ NUM_DIFFUSION_STEPS = 41
 GUIDANCE_SCALE = 8.5
 
 text_prompt_all = [
-    'a beautiful garden in front of a snow mountain',
-    'a small pond surrounded by skyscraper',
-    'a busy city with a huge wave in the background',
-    'a fountain in front of an elegant castle',
-    'a cat sitting on a meadow',
-    'a dog walking on a boat',
-    'a portrait of a man, background is a wheat field',
-    'a lighthouse among the turbulent waves',
-    'a camel in the desert',
-    'a stream train on the mountain side',
+    'A garden with a mountain in the distance.',
+    'A fountain in front of an castle.',
+    'A cat sitting on a meadow.',
+    'A lighthouse among the turbulent waves in the night.',
+    'A stream train on the mountain side.',
+    'A cactus standing in the desert.',
+    'A dog sitting on a beach.',
+    'A solitary rowboat tethered on a serene pond.',
+    'A house on a rocky mountain.',
+    'A rustic windmill on a grassy hill.',
 ]
 text_prompts_all = [
-    ['beautiful garden', 'snow mountain'],
-    ['small pond', 'skyscraper'],
-    ['busy city', 'huge wave'],
-    ['fountain', 'elegant castle'],
+    ['garden', 'mountain'],
+    ['fountain', 'castle'],
     ['cat', 'meadow'],
-    ['dog', 'boat'],
-    ['portrait of a man', 'wheat field'],
     ['lighthouse', 'turbulent waves'],
-    ['camel', 'desert'],
     ['stream train', 'mountain side'],
+    ['cactus', 'desert'],
+    ['dog', 'beach'],
+    ['rowboat', 'pond'],
+    ['house', 'mountain'],
+    ['rustic', 'hill'],
 ]
 styles = [
     'Claud Monet, impressionism, oil on canvas',
@@ -63,7 +63,7 @@ def main(args):
     region_model = RegionDiffusion(device)
     clip_model = clip_utils.CLIPEncoder()
     ldm_stable = StableDiffusionPipeline.from_pretrained(
-        "./runwayml/stable-diffusion-v1-5").to(device)
+        "runwayml/stable-diffusion-v1-5").to(device)
     tokenizer = ldm_stable.tokenizer
 
     ours_clip_scores = []
@@ -73,11 +73,11 @@ def main(args):
 
     for seed in range(init_seed, init_seed+3):
         seed_everything(seed)
-        latent = torch.randn((1, 4, 512 // 8, 512 // 8), device='cuda')
+        latent = torch.randn((1, 4, height // 8, width // 8), device='cuda')
 
         for text_prompt, text_prompts in zip(text_prompt_all, text_prompts_all):
             base_name = '_'.join(text_prompts)
-            region_model.register_evaluation_hooks()
+            region_model.register_tokenmap_hooks()
             seed_everything(seed)
             img = region_model.produce_attn_maps([text_prompt], [negative_text],
                                                  height=height, width=width, num_inference_steps=NUM_DIFFUSION_STEPS,
@@ -95,15 +95,16 @@ def main(args):
             obj_token_ids.append(obj_token_ids_rest)
             obj_token_ids = [torch.LongTensor(obj_token_id)
                              for obj_token_id in obj_token_ids]
-            region_model.masks = get_token_maps(
-                region_model.attention_maps, save_path, width//8, height//8, obj_token_ids, seed)
+            region_model.masks = get_token_maps(region_model.selfattn_maps, region_model.crossattn_maps, region_model.n_maps, save_path,
+                                     height//8, width//8, obj_token_ids[:-1], seed,
+                                     base_tokens, segment_threshold=0.3, num_segments=15)
             region_masks = [torchvision.transforms.functional.resize(region_mask, (height, width),
                                                                      interpolation=torchvision.transforms.InterpolationMode.BICUBIC, antialias=True).cpu().clamp(0, 1).numpy()
                             for region_mask in region_model.masks]
             if args.save_img:
                 imageio.imwrite(os.path.join(
                     save_path, 'ours_%s.png' % (base_name)), img[0])
-            region_model.remove_evaluation_hooks()
+            region_model.remove_tokenmap_hooks()
             for style1 in styles:
                 for style2 in styles:
                     if style1 == style2:
@@ -119,8 +120,9 @@ def main(args):
                     if not args.load_previous:
                         seed_everything(seed)
                         img_ours = region_model.prompt_to_img(text_prompts_rich, [negative_text],
-                                                              height=height, width=width, num_inference_steps=NUM_DIFFUSION_STEPS,
-                                                              guidance_scale=GUIDANCE_SCALE, text_format_dict=text_format_dict, latents=latent)
+                                                            height=height, width=width, num_inference_steps=NUM_DIFFUSION_STEPS,
+                                                            guidance_scale=GUIDANCE_SCALE, text_format_dict=text_format_dict, latents=latent,
+                                                            use_guidance=False)
                         if args.save_img:
                             imageio.imwrite(ours_name, img_ours[0])
                         img_ours = img_ours.astype(float)
@@ -136,7 +138,6 @@ def main(args):
                             imageio.imwrite(os.path.join(
                                 save_path, 'p2p_%s.png' % (base_name)), img_p2p[0])
                             imageio.imwrite(p2p_name, img_p2p[1])
-                        img_p2p = img_p2p[1:].astype(float)
                         img_p2p = img_p2p[1]
                     else:
                         img_ours = np.array(imageio.imread(ours_name))

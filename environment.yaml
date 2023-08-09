@@ -9,11 +9,11 @@ dependencies:
   - pytorch=1.13.1
   - pytorch-cuda=11.7
   - torchvision=0.14.1
-  - numpy=1.19.2
+  - numpy=1.24.3
   - pip:
-    - diffusers==0.12.1
+    - diffusers==0.18.2
     - seaborn==0.12.2
-    - transformers==4.26.0
+    - transformers==4.27.0
     - imageio==2.25.0
     - gradio==3.24.1
     - scikit-learn==0.24.1
