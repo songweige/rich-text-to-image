@@ -184,7 +184,7 @@ def main():
                                               minimum=0,
                                               maximum=1,
                                               step=0.01,
-                                              value=0.25)
+                                              value=0.55)
                 inject_interval = gr.Slider(label='Detail preservation',
                                             info='(To preserve more structure from plain-text generation, increase this. To see more rich-text attributes, decrease this.)',
                                             minimum=0,
@@ -205,7 +205,7 @@ def main():
                                                   value=0.5)
                 num_segments = gr.Slider(label='Number of segments',
                                          minimum=2,
-                                         maximum=20,
+                                         maximum=50,
                                          step=1,
                                          value=9)
                 seed = gr.Slider(label='Seed',
