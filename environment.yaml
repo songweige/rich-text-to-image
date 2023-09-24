@@ -1,4 +1,4 @@
-name: rich-text
+name: rich-text-lora
 channels:
   - pytorch
   - nvidia
@@ -11,9 +11,14 @@ dependencies:
   - torchvision=0.14.1
   - numpy=1.24.3
   - pip:
-    - diffusers==0.18.2
+    - diffusers==0.19.3
+    - accelerate==0.21.0
+    - invisible-watermark==0.2.0
+    - safetensors==0.3.1
     - seaborn==0.12.2
+    - gradio==3.44.4
     - transformers==4.27.0
+    - einops==0.6.1
     - imageio==2.25.0
-    - gradio==3.24.1
+    - scikit-image==0.19.3
     - scikit-learn==0.24.1
