@@ -5,7 +5,8 @@
 
 **tl;dr:** We use various formatting information from rich text, including font size, color, style, and footnote, to increase control of text-to-image generation. Our method enables explicit token reweighting, precise color rendering, local style control, and detailed region synthesis.
 
-https://user-images.githubusercontent.com/22885450/231924279-5d3400f0-b679-4ff9-be69-281e93265603.mp4
+
+https://github.com/songweige/rich-text-to-image/assets/22885450/ccd186d1-f0fc-4e55-80c0-06afd6cb84c0
 
 
 ***Expressive Text-to-Image Generation with Rich Text*** <br>
@@ -14,6 +15,7 @@ UMD, Adobe, CMU<br>
 ICCV 2023
 
 ## Updates
+* [09/24] We now support LoRA checkpoints. Please find the demo and the latest code in [this branch](https://github.com/songweige/rich-text-to-image/tree/lora).
 * [08/09] Our method now support [SD-XL](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) with `--model SDXL`,
 ![sdxl](assets/sdxl.png)
 and various fintuned model like [ANIMAGINE-XL](https://huggingface.co/Linaqruf/animagine-xl) with `--model AnimeXL`.
