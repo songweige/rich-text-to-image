@@ -17,7 +17,6 @@ dependencies:
     - safetensors==0.3.2
     - seaborn==0.12.2
     - transformers==4.27.0
-    - imageio==2.25.0
     - gradio==3.24.1
     - einops==0.6.1
     - imageio==2.31.1
