@@ -127,9 +127,9 @@ python visualize_token_maps.py --text_prompt "a camera on a tripod taking a pict
 
 ``` bibtex
 @inproceedings{ge2023expressive,
-      title={Expressive Text-to-Image Generation with Rich Text},
+      title={Expressive text-to-image generation with rich text},
       author={Ge, Songwei and Park, Taesung and Zhu, Jun-Yan and Huang, Jia-Bin},
-      booktitle={IEEE International Conference on Computer Vision (ICCV)},
+      booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
       year={2023}
 }
 ```
