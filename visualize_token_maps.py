@@ -4,7 +4,7 @@ import imageio
 import argparse
 from models.region_diffusion import RegionDiffusion
 from models.region_diffusion_sdxl import RegionDiffusionXL
-from utils.attention_utils import get_token_maps
+from utils.attention_utils import get_token_maps 
 from utils.richtext_utils import seed_everything
 
 
